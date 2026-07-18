@@ -3,40 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verificador de Lotomania (Ajuste de Dezenas)</title>
+    <title>Conferidor Lotomania Pro</title>
     
     <!-- Biblioteca de IA para ler a imagem -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f4f2;
             color: #333;
-            margin: 0;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 650px;
+            max-width: 600px;
             width: 100%;
             background: #ffffff;
-            padding: 30px;
+            padding: 25px;
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
 
         h1 {
             color: #ff6600;
             text-align: center;
-            margin-top: 0;
-            font-size: 28px;
+            margin-bottom: 20px;
+            font-size: 26px;
         }
 
         .section {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
 
         label {
@@ -44,6 +51,7 @@
             margin-bottom: 8px;
             font-weight: 600;
             color: #444;
+            font-size: 14px;
         }
 
         textarea {
@@ -51,9 +59,8 @@
             height: 90px;
             padding: 12px;
             border: 2px solid #ddd;
-            border-radius: 6px;
+            border-radius: 8px;
             resize: none;
-            box-sizing: border-box;
             font-size: 16px;
             letter-spacing: 1px;
             font-family: monospace;
@@ -68,24 +75,26 @@
         input[type="file"] {
             display: block;
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: #f9f9f9;
-            border: 2px dashed #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
+            border: 2px dashed #bbb;
+            border-radius: 8px;
             cursor: pointer;
+            font-size: 14px;
         }
 
         button {
             width: 100%;
-            padding: 14px;
+            padding: 15px;
             background-color: #00a859;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 18px;
+            border-radius: 8px;
+            font-size: 16px;
             cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.2s;
+            -webkit-tap-highlight-color: transparent;
         }
 
         button:hover {
@@ -101,78 +110,82 @@
             text-align: center;
             font-weight: bold;
             color: #ff6600;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         #resultado {
-            margin-top: 25px;
-            padding: 20px;
+            margin-top: 20px;
+            padding: 15px;
             background-color: #f4faf6;
-            border: 2px solid #e0f2e9;
+            border: 1px solid #e0f2e9;
             border-left: 6px solid #00a859;
-            border-radius: 6px;
+            border-radius: 8px;
         }
 
         #total-acertos {
-            font-size: 16px;
+            font-size: 15px;
             line-height: 1.6;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
             border-bottom: 1px dashed #ddd;
         }
 
         .grid-numeros {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
             gap: 8px;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .badge {
-            display: inline-block;
-            width: 36px;
-            height: 36px;
-            line-height: 36px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1 / 1;
             color: white;
             border-radius: 50%;
             font-weight: bold;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .acerto {
             background-color: #00a859 !important;
-            box-shadow: 0 2px 6px rgba(0, 168, 89, 0.4);
+            box-shadow: 0 2px 5px rgba(0, 168, 89, 0.3);
         }
 
         .normal {
             background-color: #9e9e9e;
+        }
+
+        @media (max-width: 380px) {
+            h1 { font-size: 22px; }
+            .grid-numeros { grid-template-columns: repeat(5, 1fr); }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Conferidor Prático Lotomania</h1>
+        <h1>Conferidor Lotomania</h1>
         
         <div class="section">
-            <label for="sorteados">1. Digite as 20 dezenas sorteadas (com 2 dígitos, ex: 05 - 09 - 14):</label>
-            <textarea id="sorteados" placeholder="Ex: Digite 02, depois 09, depois 14..."></textarea>
+            <label for="sorteados">1. Digite as 20 dezenas sorteadas:</label>
+            <textarea id="sorteados" placeholder="Digite os números direto, ex: 021532..."></textarea>
         </div>
 
         <div class="section">
-            <label for="upload-imagem">2. Carregue a imagem da sua cartela (somente texto):</label>
-            <input type="file" id="upload-imagem" accept="image/*">
+            <label for="upload-imagem">2. Tire uma foto ou envie o arquivo da cartela:</label>
+            <input type="file" id="upload-imagem" accept="image/*" capture="environment">
         </div>
 
         <button id="btn-verificar">Analisar Jogo</button>
 
-        <div id="loading" class="hidden">Processando imagem e extraindo dezenas... Aguarde.</div>
+        <div id="loading" class="hidden">Lendo imagem e filtrando dezenas... Aguarde.</div>
         
         <div id="resultado" class="hidden">
             <div id="total-acertos"></div>
             <h3>Seu Jogo Escaneado:</h3>
-            <p style="font-size: 13px; color: #666; margin-top: -8px;">As dezenas em verde foram sorteadas.</p>
+            <p style="font-size: 12px; color: #666; margin-top: -2px; margin-bottom: 5px;">As dezenas em verde foram sorteadas.</p>
             <div id="numeros-acertados" class="grid-numeros"></div>
         </div>
     </div>
@@ -180,49 +193,34 @@
     <script>
         const campoSorteados = document.getElementById('sorteados');
 
-        // --- MÁSCARA INTELIGENTE EM TEMPO REAL ---
+        // --- MÁSCARA AUTOMÁTICA ---
         campoSorteados.addEventListener('input', (e) => {
             let textoOriginal = e.target.value;
             
-            // Se o usuário digitou um espaço ou traço logo após um único dígito (ex: digitou "5" e deu espaço)
-            // nós forçamos o zero na frente antes de aplicar a limpeza física.
             if (textoOriginal.match(/\b\d\s/)) {
                 textoOriginal = textoOriginal.replace(/\b(\d)\b/g, '0$1');
             }
 
-            // Remove tudo o que não for número
             let numeros = textoOriginal.replace(/\D/g, '');
-            
-            // Se houver uma sequência isolada de números ímpares no final, vamos estruturar em pares
-            // Exemplo: se o usuário digitar 05 e depois apenas o número 9, fica "05 - 9". 
-            // Assim que ele digitar o próximo número (ex: 2), o "9" vira "09" e o "2" começa o próximo bloco.
-            let blocos = [];
+            let _blocos = [];
             for (let i = 0; i < numeros.length; i += 2) {
-                let bloco = numeros.substr(i, 2);
-                
-                // Se for o último bloco, tiver apenas 1 dígito E o usuário continuar digitando,
-                // nós podemos tratar a inserção do zero na validação final ou deixar o dígito visualmente ali
-                blocos.push(bloco);
+                _blocos.push(numeros.substr(i, 2));
             }
 
-            // Garante o limite máximo de 20 dezenas (40 caracteres)
-            if (blocos.length > 20) {
-                blocos = blocos.slice(0, 20);
+            if (_blocos.length > 20) {
+                _blocos = _blocos.slice(0, 20);
             }
 
-            // Atualiza o campo separando por traços bonitinho
-            e.target.value = blocos.join(' - ');
+            e.target.value = _blocos.join(' - ');
         });
 
-        // Evento complementar: quando o usuário clica fora do campo (blur), 
-        // se ele deixou algum número de 1 dígito perdido (ex: "5"), o sistema corrige para "05" automaticamente.
         campoSorteados.addEventListener('blur', (e) => {
             let dezenas = e.target.value.split(' - ');
             dezenas = dezenas.map(d => (d.length === 1 && d !== '') ? '0' + d : d);
             e.target.value = dezenas.filter(d => d !== '').join(' - ');
         });
 
-        // --- PROCESSAMENTO DO CONFERIDOR ---
+        // --- PROCESSAMENTO COM FILTRO RÍGIDO (00-99) ---
         document.getElementById('btn-verificar').addEventListener('click', async () => {
             const inputSorteados = campoSorteados.value;
             const arquivoImagem = document.getElementById('upload-imagem').files[0];
@@ -230,17 +228,16 @@
             const resultadoDiv = document.getElementById('resultado');
 
             if (!inputSorteados || !arquivoImagem) {
-                alert('Por favor, preencha as dezenas sorteadas e selecione a foto da cartela.');
+                alert('Por favor, preencha as dezenas e capture a imagem da cartela.');
                 return;
             }
 
-            // Pega as dezenas e faz uma última checagem para cravar o zero à esquerda se necessário
             let dezenasSorteadas = inputSorteados.match(/\d+/g) || [];
             dezenasSorteadas = dezenasSorteadas.map(num => num.length === 1 ? '0' + num : num);
             dezenasSorteadas = [...new Set(dezenasSorteadas)];
             
             if (dezenasSorteadas.length !== 20) {
-                alert(`A Lotomania possui obrigatoriamente 20 números sorteados. O sistema identificou ${dezenasSorteadas.length}. Confira o campo de digitação.`);
+                alert(`A Lotomania possui 20 números sorteados. Identificados: ${dezenasSorteadas.length}. Verifique.`);
                 return;
             }
 
@@ -250,14 +247,20 @@
             try {
                 const { data: { text } } = await Tesseract.recognize(arquivoImagem, 'por');
                 
-                // Extração robusta do scanner (garantindo também o 0 na frente dos números lidos da folha)
-                let dezenasJogadas = text.match(/\d+/g) || [];
-                dezenasJogadas = dezenasJogadas.map(num => num.length === 1 ? '0' + num : num);
+                // 1. Captura apenas blocos isolados de EXATAMENTE 2 dígitos numéricos
+                let dezenasJogadas = text.match(/\b\d{2}\b/g) || [];
                 
-                const dezenasUnicas = [...new Set(dezenasJogadas)];
+                // 2. Filtro de segurança extra: Garante matematicamente que está entre 0 e 99
+                // Isso elimina qualquer leitura acidental acima de 100
+                let dezenasValidadas = dezenasJogadas.filter(num => {
+                    const n = parseInt(num, 10);
+                    return n >= 0 && n <= 99;
+                });
+                
+                const dezenasUnicas = [...new Set(dezenasValidadas)];
 
                 if (dezenasUnicas.length === 0) {
-                    alert('Não consegui identificar nenhum número na foto. Verifique o foco.');
+                    alert('Não identifiquei dezenas válidas (00-99) na foto. Tente alinhar melhor a imagem.');
                     loading.classList.add('hidden');
                     return;
                 }
@@ -265,8 +268,8 @@
                 const acertos = dezenasUnicas.filter(num => dezenasSorteadas.includes(num));
 
                 document.getElementById('total-acertos').innerHTML = `
-                    Dezenas detectadas na cartela: <strong>${dezenasUnicas.length}</strong>.<br>
-                    <span style="font-size: 24px; color: #00a859;"><strong>Total de Acertos: ${acertos.length}</strong></span>
+                    Dezenas válidas detectadas: <strong>${dezenasUnicas.length}</strong> de 50.<br>
+                    <span style="font-size: 22px; color: #00a859;"><strong>Total de Acertos: ${acertos.length}</strong></span>
                 `;
                 
                 const areaNumeros = document.getElementById('numeros-acertados');
